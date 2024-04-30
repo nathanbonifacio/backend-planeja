@@ -24,5 +24,5 @@ export class UpdateUserDto {
         required: false,
         description: 'Field containing the Whatsapp number of the user.'
     })
-    whatsapp?: number;
+    whatsapp?: string;
 }

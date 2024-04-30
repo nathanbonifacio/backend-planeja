@@ -6,6 +6,8 @@ import { Not, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { BaseService } from 'src/base/base.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+// import { UpdatePasswordDto } from './dto/update-password.dto';
+
 @Injectable()
 export class UserService extends BaseService<User> {
   constructor(
@@ -23,6 +25,19 @@ export class UserService extends BaseService<User> {
       throw new BadRequestException(
         `O email ${createUserDto.email} já está cadastrado`,
       );
+    }
+
+    const isStrongPassword = this.validatePasswordStrength(
+      createUserDto.password,
+    );
+    if (!isStrongPassword) {
+      throw new BadRequestException("A senha não é forte o suficiente");
+    }
+
+    if (
+      createUserDto.confirmPassword != createUserDto.password
+    ) {
+      throw new BadRequestException("As senhas devem ser iguais");
     }
 
     const userToCreate = {
@@ -79,5 +94,24 @@ export class UserService extends BaseService<User> {
     return this.usersRepository.delete(userId);
   }
 
-  
+  // async reset(
+  //   userId: number,
+  //   updatePasswordDto: UpdatePasswordDto,
+  // ) {
+
+  //   const existingUser = this.userService._getByParams({
+  //     id: userId,
+  //   });
+  //   if (!existingUser) {
+  //     return 'Usuário não encontrado';
+  //   }
+  // }
+
+  private validatePasswordStrength(password: string): boolean {
+    const passwordValidationRegex = new RegExp(
+      '^(?=(.*[aA-zZ]))(?=(.*[0-9]))(?=(.*[!@#$%^&*()\\-_+.])).{8,}$',
+    );
+
+    return passwordValidationRegex.test(password);
+  }
 }

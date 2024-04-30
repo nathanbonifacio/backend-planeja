@@ -1,9 +1,9 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from "@nestjs/swagger";
-import { CreatePasswordDto } from "./create-password.dto";
 import { IsStrongPassword } from "class-validator";
+import { CreateUserDto } from "./create-user.dto";
 
-export class UpdatePasswordDto extends CreatePasswordDto {
+export class UpdatePasswordDto extends CreateUserDto {
     @ApiProperty({
         required: true,
         description: 'Field containing the current password of the user.'
