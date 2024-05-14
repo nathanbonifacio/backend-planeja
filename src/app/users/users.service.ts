@@ -6,7 +6,6 @@ import { Not, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { BaseService } from 'src/base/base.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-// import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Injectable()
 export class UserService extends BaseService<User> {
@@ -87,25 +86,12 @@ export class UserService extends BaseService<User> {
     const existingUser = await this._getByParams({
       id: userId,
     });
-    if (existingUser) {
+    if (!existingUser) {
       throw new BadRequestException(`O client ${userId} não foi encontrado.`);
     }
 
     return this.usersRepository.delete(userId);
   }
-
-  // async reset(
-  //   userId: number,
-  //   updatePasswordDto: UpdatePasswordDto,
-  // ) {
-
-  //   const existingUser = this.userService._getByParams({
-  //     id: userId,
-  //   });
-  //   if (!existingUser) {
-  //     return 'Usuário não encontrado';
-  //   }
-  // }
 
   private validatePasswordStrength(password: string): boolean {
     const passwordValidationRegex = new RegExp(
