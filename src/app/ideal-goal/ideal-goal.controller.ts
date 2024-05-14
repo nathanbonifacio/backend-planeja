@@ -69,7 +69,7 @@ export class IdealGoalController {
     description:
       'Error thrown whenever the User is trying to be deleted does not exist.',
   })
-  async deleteIdealGoalById(idealGoalId: number) {
+  async deleteIdealGoalById(@Param('id') idealGoalId: number) {
     return this.idealGoalService.deleteIdealGoalById(idealGoalId);
   }
 }

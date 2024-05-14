@@ -62,10 +62,10 @@ export class IdealGoal {
   @Column({ name: 'end_date', type: 'date', nullable: true })
   endDate?: Date;
 
-  @Column({ name: 'created_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ name: 'created_at', type: 'timestamp', default: () => 'now()', nullable: false })
   createdAt: Date;
 
-  @Column({ name: 'updated_at', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+  @Column({ name: 'updated_at', type: 'timestamp', onUpdate: 'now()', nullable: true })
   updatedAt: Date;
 
   @BeforeInsert()
