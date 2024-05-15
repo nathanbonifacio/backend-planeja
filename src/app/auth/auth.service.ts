@@ -1,13 +1,10 @@
-/* eslint-disable prettier/prettier */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../users/users.service';
 import { AuthLoginDto } from './dto/auth-login.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly userService: UserService,
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
   async login(authLoginDto: AuthLoginDto) {
     const existingUser = await this.userService._getByParams({
@@ -24,7 +21,6 @@ export class AuthService {
     const email = existingUser.email;
     const password = existingPassword.password;
 
-    return {email, password};
-
+    return { email, password };
   }
 }

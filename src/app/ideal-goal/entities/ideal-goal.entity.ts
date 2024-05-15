@@ -1,7 +1,15 @@
-/* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
 import { FinancialControll } from 'src/app/financial-control/entities/financial-controll.entity';
-import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { RealGoal } from 'src/app/real-goal/entities/real-goal.entity';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('ideal_goal')
 export class IdealGoal {
@@ -23,7 +31,10 @@ export class IdealGoal {
   })
   financialControllId: number;
 
-  @ManyToOne(() => FinancialControll, financialControll => financialControll.idealGoals)
+  @ManyToOne(
+    () => FinancialControll,
+    (financialControll) => financialControll.idealGoals,
+  )
   @JoinColumn({ name: 'financial_controll_id' })
   financialControll: FinancialControll;
 
@@ -62,11 +73,24 @@ export class IdealGoal {
   @Column({ name: 'end_date', type: 'date', nullable: true })
   endDate?: Date;
 
-  @Column({ name: 'created_at', type: 'timestamp', default: () => 'now()', nullable: false })
+  @Column({
+    name: 'created_at',
+    type: 'timestamp',
+    default: () => 'now()',
+    nullable: false,
+  })
   createdAt: Date;
 
-  @Column({ name: 'updated_at', type: 'timestamp', onUpdate: 'now()', nullable: true })
+  @Column({
+    name: 'updated_at',
+    type: 'timestamp',
+    onUpdate: 'now()',
+    nullable: true,
+  })
   updatedAt: Date;
+
+  @OneToMany(() => RealGoal, (realGoal) => realGoal.idealGoal)
+  realGoal: RealGoal[];
 
   @BeforeInsert()
   setStartDate() {

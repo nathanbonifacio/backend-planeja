@@ -1,6 +1,6 @@
-/* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
 import { IdealGoal } from 'src/app/ideal-goal/entities/ideal-goal.entity';
+import { Inputs } from 'src/app/inputs/entities/inputs.entity';
 import { User } from 'src/app/users/entities/users.entity';
 import {
   Column,
@@ -51,6 +51,9 @@ export class FinancialControll {
   @Column({ name: 'variable_expenses', type: 'double', nullable: true })
   variableExpenses: number;
 
-  @OneToMany(() => IdealGoal, idealGoal => idealGoal.financialControll)
+  @OneToMany(() => IdealGoal, (idealGoal) => idealGoal.financialControll)
   idealGoals: IdealGoal[];
+
+  @OneToMany(() => Inputs, (inputs) => inputs.financialControll)
+  inputs: Inputs[];
 }

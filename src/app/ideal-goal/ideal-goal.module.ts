@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { IdealGoalController } from './ideal-goal.controller';
 import { IdealGoalService } from './ideal-goal.service';
@@ -8,10 +7,7 @@ import { FinancialControllModule } from '../financial-control/financial-controll
 
 @Module({
   controllers: [IdealGoalController],
-  imports: [
-    TypeOrmModule.forFeature([IdealGoal]),
-    FinancialControllModule,
-  ],
+  imports: [TypeOrmModule.forFeature([IdealGoal]), FinancialControllModule],
   exports: [IdealGoalService],
   providers: [IdealGoalService],
 })

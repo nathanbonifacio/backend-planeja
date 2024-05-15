@@ -10,6 +10,10 @@ import { FinancialControllModule } from './app/financial-control/financial-contr
 import { FinancialControll } from './app/financial-control/entities/financial-controll.entity';
 import { IdealGoal } from './app/ideal-goal/entities/ideal-goal.entity';
 import { IdealGoalModule } from './app/ideal-goal/ideal-goal.module';
+import { RealGoalModule } from './app/real-goal/real-goal.module';
+import { RealGoal } from './app/real-goal/entities/real-goal.entity';
+import { Inputs } from './app/inputs/entities/inputs.entity';
+import { InputsModule } from './app/inputs/inputs.module';
 
 @Module({
   imports: [
@@ -21,13 +25,15 @@ import { IdealGoalModule } from './app/ideal-goal/ideal-goal.module';
       username: 'root',
       password: 'admin',
       database: 'planeja',
-      entities: [User, FinancialControll, IdealGoal],
+      entities: [User, FinancialControll, IdealGoal, RealGoal, Inputs],
       synchronize: process.env.ENV === 'development',
     }),
     UserModule,
     AuthModule,
     FinancialControllModule,
     IdealGoalModule,
+    RealGoalModule,
+    InputsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

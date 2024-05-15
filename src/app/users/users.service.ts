@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/users.entity';
@@ -30,13 +29,11 @@ export class UserService extends BaseService<User> {
       createUserDto.password,
     );
     if (!isStrongPassword) {
-      throw new BadRequestException("A senha não é forte o suficiente");
+      throw new BadRequestException('A senha não é forte o suficiente');
     }
 
-    if (
-      createUserDto.confirmPassword != createUserDto.password
-    ) {
-      throw new BadRequestException("As senhas devem ser iguais");
+    if (createUserDto.confirmPassword != createUserDto.password) {
+      throw new BadRequestException('As senhas devem ser iguais');
     }
 
     const userToCreate = {
@@ -50,12 +47,10 @@ export class UserService extends BaseService<User> {
 
   async updateUserById(userId: number, updateUserDto: UpdateUserDto) {
     const existingUser = await this._getByParams({
-     id: userId,
+      id: userId,
     });
     if (!existingUser) {
-      throw new BadRequestException(
-        `O usuário ${userId} não está cadastrado.`,
-      );
+      throw new BadRequestException(`O usuário ${userId} não está cadastrado.`);
     }
 
     if (updateUserDto.email) {
@@ -74,10 +69,7 @@ export class UserService extends BaseService<User> {
       ...updateUserDto,
     };
 
-    const userUpdated = await this.usersRepository.update(
-      userId,
-      userToUpdate,
-    );
+    const userUpdated = await this.usersRepository.update(userId, userToUpdate);
 
     return userUpdated;
   }

@@ -8,10 +8,8 @@ import {
   ApiOkResponse,
   ApiNoContentResponse,
 } from '@nestjs/swagger';
-import { CreateUserDto } from '../users/dto/create-user.dto';
 import { CreateIdealGoalDto } from './dto/create-ideal-goal.dto';
 import { UpdateIdealGoalDto } from './dto/update-ideal-goal.dto';
-import { UpdateUserDto } from '../users/dto/update-user.dto';
 
 @Controller('ideal-goal')
 export class IdealGoalController {
@@ -20,7 +18,7 @@ export class IdealGoalController {
   @Post()
   @ApiOperation({ summary: 'creates a new ideal goal of the user.' })
   @ApiCreatedResponse({
-    type: CreateUserDto,
+    type: CreateIdealGoalDto,
     description:
       'Value returned whenever a ideal goal of the user is created successfully.',
   })
@@ -37,7 +35,6 @@ export class IdealGoalController {
   @Put(':id')
   @ApiOperation({ summary: 'Updates an ideal goal of the user by its ID.' })
   @ApiOkResponse({
-    type: UpdateUserDto,
     description:
       'Value returned whenever a ideal goal of the user is updated successfully.',
   })

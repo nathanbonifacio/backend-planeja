@@ -8,9 +8,7 @@ import {
   ApiOkResponse,
   ApiNoContentResponse,
 } from '@nestjs/swagger';
-import { CreateUserDto } from '../users/dto/create-user.dto';
 import { CreateFinancialControllDto } from './dto/create-financial-controll.dto';
-import { UpdateUserDto } from '../users/dto/update-user.dto';
 import { UpdateFinancialControllDto } from './dto/update-financial-controll.dto';
 
 @Controller('financial-controll')
@@ -22,7 +20,7 @@ export class FinancialControllController {
   @Post()
   @ApiOperation({ summary: 'creates a new user financial controll.' })
   @ApiCreatedResponse({
-    type: CreateUserDto,
+    type: CreateFinancialControllDto,
     description:
       'Value returned whenever a user financial controll is created successfully.',
   })
@@ -41,7 +39,6 @@ export class FinancialControllController {
   @Put(':id')
   @ApiOperation({ summary: 'Updates an user financial controlll by its ID.' })
   @ApiOkResponse({
-    type: UpdateUserDto,
     description:
       'Value returned whenever a user financial controll is updated successfully.',
   })

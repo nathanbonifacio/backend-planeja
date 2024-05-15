@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { BaseService } from 'src/base/base.service';
 import { IdealGoal } from './entities/ideal-goal.entity';
@@ -83,7 +82,7 @@ export class IdealGoalService extends BaseService<IdealGoal> {
     if (!existingIdealGoal) {
       throw new BadRequestException('Meta não encontrada.');
     }
-  
+
     if (updateIdealGoalDto.monthlyValue) {
       const newMonthlyValue = updateIdealGoalDto.monthlyValue;
       existingIdealGoal.monthlyValue = newMonthlyValue;
@@ -91,9 +90,13 @@ export class IdealGoalService extends BaseService<IdealGoal> {
         newMonthlyValue,
         existingIdealGoal.totalValue,
       );
-      existingIdealGoal.endDate = new Date(year, month, existingIdealGoal.startDate.getDate());
+      existingIdealGoal.endDate = new Date(
+        year,
+        month,
+        existingIdealGoal.startDate.getDate(),
+      );
     }
-  
+
     if (updateIdealGoalDto.endDate) {
       const newEndDate = new Date(updateIdealGoalDto.endDate);
       existingIdealGoal.endDate = newEndDate;
@@ -102,20 +105,25 @@ export class IdealGoalService extends BaseService<IdealGoal> {
         newEndDate,
       );
     }
-  
-    if (updateIdealGoalDto.totalValue && updateIdealGoalDto.totalValue !== existingIdealGoal.totalValue) {
+
+    if (
+      updateIdealGoalDto.totalValue &&
+      updateIdealGoalDto.totalValue !== existingIdealGoal.totalValue
+    ) {
       const newTotalValue = updateIdealGoalDto.totalValue;
-      const remainingMonths = this.calculateRemainingMonths(existingIdealGoal.endDate);
+      const remainingMonths = this.calculateRemainingMonths(
+        existingIdealGoal.endDate,
+      );
       const newMonthlyValue = newTotalValue / remainingMonths;
       existingIdealGoal.totalValue = newTotalValue;
       existingIdealGoal.monthlyValue = newMonthlyValue;
     }
-  
-    existingIdealGoal.goalName = updateIdealGoalDto.goalName ?? existingIdealGoal.goalName;
-    
+
+    existingIdealGoal.goalName =
+      updateIdealGoalDto.goalName ?? existingIdealGoal.goalName;
+
     return this.idealGoalRepository.save(existingIdealGoal);
   }
-  
 
   async deleteIdealGoalById(idealGoalId: number) {
     const existingIdealGoal = await this._getByParams({ id: idealGoalId });

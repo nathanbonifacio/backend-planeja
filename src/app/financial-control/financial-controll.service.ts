@@ -1,5 +1,9 @@
-/* eslint-disable prettier/prettier */
-import { BadRequestException, Inject, Injectable, forwardRef } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { BaseService } from 'src/base/base.service';
 import { FinancialControll } from './entities/financial-controll.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,13 +20,15 @@ export class FinancialControllService extends BaseService<FinancialControll> {
 
     @Inject(forwardRef(() => UserService))
     private userService: UserService,
-  ) { super(financialControllRepository); }
+  ) {
+    super(financialControllRepository);
+  }
 
   async createFinancialControll(
     createFinancialControlDto: CreateFinancialControllDto,
   ) {
     const existingUser = await this.userService._getByParams({
-        id: createFinancialControlDto.userId,
+      id: createFinancialControlDto.userId,
     });
     if (!existingUser) {
       throw new BadRequestException('Usuário não encontrado');
@@ -36,14 +42,15 @@ export class FinancialControllService extends BaseService<FinancialControll> {
     updateFinancialControl: UpdateFinancialControllDto,
   ) {
     const existingUser = await this.userService._getByParams({
-        id: financialId,
+      id: financialId,
     });
     if (!existingUser) {
       throw new BadRequestException('Usuário não encontrado');
     }
 
     const financialUpdated = await this.financialControllRepository.update(
-        financialId, updateFinancialControl
+      financialId,
+      updateFinancialControl,
     );
 
     return financialUpdated;
@@ -51,7 +58,7 @@ export class FinancialControllService extends BaseService<FinancialControll> {
 
   async deleteFinancialControll(financialId: number) {
     const existingFinancialId = await this._getByParams({
-        id: financialId,
+      id: financialId,
     });
     if (!existingFinancialId) {
       throw new BadRequestException('Usuário não encontrado');
