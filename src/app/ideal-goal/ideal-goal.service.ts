@@ -1,5 +1,9 @@
-/* eslint-disable prettier/prettier */
-import { BadRequestException, Inject, Injectable, forwardRef } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { BaseService } from 'src/base/base.service';
 import { IdealGoal } from './entities/ideal-goal.entity';
 import { Repository } from 'typeorm';
@@ -7,9 +11,9 @@ import { CreateIdealGoalDto } from './dto/create-ideal-goal.dto';
 import { FinancialControllService } from '../financial-control/financial-controll.service';
 import { UpdateIdealGoalDto } from './dto/update-ideal-goal.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-//import { CreateRealGoalDto } from '../real-goal/dto/create-real-goal.dto';
 import { RealGoalService } from '../real-goal/real-goal.service';
 import { RealGoal } from '../real-goal/entities/real-goal.entity';
+import { InputsService } from '../inputs/inputs.service';
 
 @Injectable()
 export class IdealGoalService extends BaseService<IdealGoal> {
@@ -18,8 +22,12 @@ export class IdealGoalService extends BaseService<IdealGoal> {
     private readonly idealGoalRepository: Repository<IdealGoal>,
 
     private financialControllService: FinancialControllService,
+
     @Inject(forwardRef(() => RealGoalService))
     private realGoalService: RealGoalService,
+
+    @Inject(forwardRef(() => InputsService))
+    private inputsService: InputsService,
   ) {
     super(idealGoalRepository);
   }
@@ -76,11 +84,11 @@ export class IdealGoalService extends BaseService<IdealGoal> {
       );
     }
 
-    const idealGoalToInsert = {...createIdealGoalDto};
+    const idealGoalToInsert = { ...createIdealGoalDto };
 
     const idealGoal = this.idealGoalRepository.save(idealGoalToInsert);
 
-    await this.insertRealGoal((await idealGoal).id)
+    await this.insertRealGoal((await idealGoal).id);
 
     return idealGoal;
   }
@@ -94,69 +102,95 @@ export class IdealGoalService extends BaseService<IdealGoal> {
       throw new BadRequestException('Meta não encontrada.');
     }
 
-      // Converter datas para instâncias de Date se necessário
-  if (updateIdealGoalDto.startDate && !(updateIdealGoalDto.startDate instanceof Date)) {
-    updateIdealGoalDto.startDate = new Date(updateIdealGoalDto.startDate);
-  }
-  if (updateIdealGoalDto.endDate && !(updateIdealGoalDto.endDate instanceof Date)) {
-    updateIdealGoalDto.endDate = new Date(updateIdealGoalDto.endDate);
-  }
-  if (existingIdealGoal.startDate && !(existingIdealGoal.startDate instanceof Date)) {
-    existingIdealGoal.startDate = new Date(existingIdealGoal.startDate);
-  }
-  if (existingIdealGoal.endDate && !(existingIdealGoal.endDate instanceof Date)) {
-    existingIdealGoal.endDate = new Date(existingIdealGoal.endDate);
-  }
+    // Converter datas para instâncias de Date se necessário
+    if (
+      updateIdealGoalDto.startDate &&
+      !(updateIdealGoalDto.startDate instanceof Date)
+    ) {
+      updateIdealGoalDto.startDate = new Date(updateIdealGoalDto.startDate);
+    }
+    if (
+      updateIdealGoalDto.endDate &&
+      !(updateIdealGoalDto.endDate instanceof Date)
+    ) {
+      updateIdealGoalDto.endDate = new Date(updateIdealGoalDto.endDate);
+    }
+    if (
+      existingIdealGoal.startDate &&
+      !(existingIdealGoal.startDate instanceof Date)
+    ) {
+      existingIdealGoal.startDate = new Date(existingIdealGoal.startDate);
+    }
+    if (
+      existingIdealGoal.endDate &&
+      !(existingIdealGoal.endDate instanceof Date)
+    ) {
+      existingIdealGoal.endDate = new Date(existingIdealGoal.endDate);
+    }
 
     const idealGoalToUpdate = {
       ...existingIdealGoal,
       ...updateIdealGoalDto,
+    };
+
+    // Se o totalValue for atualizado, recalcular endDate ou monthlyValue
+    if (updateIdealGoalDto.totalValue !== undefined) {
+      if (idealGoalToUpdate.monthlyValue) {
+        const { year, month } = this.calculateFutureDate(
+          idealGoalToUpdate.monthlyValue,
+          idealGoalToUpdate.totalValue,
+        );
+        idealGoalToUpdate.endDate = new Date(
+          year,
+          month,
+          idealGoalToUpdate.startDate.getDate(),
+        );
+      } else if (idealGoalToUpdate.endDate) {
+        idealGoalToUpdate.monthlyValue = this.calculateMonthlySavings(
+          idealGoalToUpdate.totalValue,
+          idealGoalToUpdate.endDate,
+        );
+      }
     }
 
-     // Se o totalValue for atualizado, recalcular endDate ou monthlyValue
-  if (updateIdealGoalDto.totalValue !== undefined) {
-    if (idealGoalToUpdate.monthlyValue) {
-      const { year, month } = this.calculateFutureDate(
-        idealGoalToUpdate.monthlyValue,
-        idealGoalToUpdate.totalValue,
-      );
-      idealGoalToUpdate.endDate = new Date(year, month, idealGoalToUpdate.startDate.getDate());
-    } else if (idealGoalToUpdate.endDate) {
+    // Se o endDate for atualizado, recalcular monthlyValue
+    if (
+      updateIdealGoalDto.endDate !== undefined &&
+      !updateIdealGoalDto.monthlyValue
+    ) {
       idealGoalToUpdate.monthlyValue = this.calculateMonthlySavings(
         idealGoalToUpdate.totalValue,
         idealGoalToUpdate.endDate,
       );
     }
-  }
 
-  // Se o endDate for atualizado, recalcular monthlyValue
-  if (updateIdealGoalDto.endDate !== undefined && !updateIdealGoalDto.monthlyValue) {
-    idealGoalToUpdate.monthlyValue = this.calculateMonthlySavings(
-      idealGoalToUpdate.totalValue,
-      idealGoalToUpdate.endDate,
-    );
-  }
+    // Se o monthlyValue for atualizado, recalcular endDate
+    if (
+      updateIdealGoalDto.monthlyValue !== undefined &&
+      !updateIdealGoalDto.endDate
+    ) {
+      const { year, month } = this.calculateFutureDate(
+        idealGoalToUpdate.monthlyValue,
+        idealGoalToUpdate.totalValue,
+      );
+      idealGoalToUpdate.endDate = new Date(
+        year,
+        month,
+        idealGoalToUpdate.startDate.getDate(),
+      );
+    }
 
-  // Se o monthlyValue for atualizado, recalcular endDate
-  if (updateIdealGoalDto.monthlyValue !== undefined && !updateIdealGoalDto.endDate) {
-    const { year, month } = this.calculateFutureDate(
-      idealGoalToUpdate.monthlyValue,
-      idealGoalToUpdate.totalValue,
-    );
-    idealGoalToUpdate.endDate = new Date(year, month, idealGoalToUpdate.startDate.getDate());
-  }
-
-  // Validar se a poupança mensal não ultrapassa a renda
-  const existingFinancialControll =
-    await this.financialControllService._getByParams({
-      id: idealGoalToUpdate.financialControllId,
-    });
-  if (idealGoalToUpdate.monthlyValue > existingFinancialControll.income) {
-    throw new BadRequestException(
-      `Sua poupança mensal não pode ultrapassar o valor de sua renda. 
+    // Validar se a poupança mensal não ultrapassa a renda
+    const existingFinancialControll =
+      await this.financialControllService._getByParams({
+        id: idealGoalToUpdate.financialControllId,
+      });
+    if (idealGoalToUpdate.monthlyValue > existingFinancialControll.income) {
+      throw new BadRequestException(
+        `Sua poupança mensal não pode ultrapassar o valor de sua renda. 
       ${idealGoalToUpdate.monthlyValue} é maior que a sua renda de ${existingFinancialControll.income}.`,
-    );
-  }
+      );
+    }
 
     return this.idealGoalRepository.save(idealGoalToUpdate);
   }
@@ -166,6 +200,15 @@ export class IdealGoalService extends BaseService<IdealGoal> {
     if (!existingIdealGoal) {
       throw new BadRequestException('Meta não encontrada.');
     }
+
+    const existingRealGoal = await this.realGoalService._getByParams({
+      id: idealGoalId - 2,
+    });
+    if (!existingRealGoal) {
+      throw new BadRequestException('Meta real não encontrada.');
+    }
+
+    await this.realGoalService.deleteRealGoal(existingRealGoal.id);
 
     return this.idealGoalRepository.delete(idealGoalId);
   }
@@ -205,25 +248,12 @@ export class IdealGoalService extends BaseService<IdealGoal> {
       throw new Error('Prazo inválido. A data limite deve ser no futuro.');
     }
 
-    return targetAmount / remainingMonths;
+    return parseFloat((targetAmount / remainingMonths).toFixed(2));
   }
 
-  private calculateRemainingMonths(endDate: Date): number {
-    const today = new Date();
-    return (
-      (endDate.getFullYear() - today.getFullYear()) * 12 +
-      endDate.getMonth() -
-      today.getMonth()
-    );
-  }
-
-  insertRealGoal(
-    idealGoalId: number,
-    //realGoal: CreateRealGoalDto,
-  ): Promise<RealGoal> {
+  insertRealGoal(idealGoalId: number): Promise<RealGoal> {
     return this.realGoalService.createRealGoal({
-      //...realGoal,
-      idealGoalId: idealGoalId
+      idealGoalId: idealGoalId,
     });
   }
 }
