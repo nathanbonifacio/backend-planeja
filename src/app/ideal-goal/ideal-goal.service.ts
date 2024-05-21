@@ -133,7 +133,6 @@ export class IdealGoalService extends BaseService<IdealGoal> {
       ...updateIdealGoalDto,
     };
 
-    // Se o totalValue for atualizado, recalcular endDate ou monthlyValue
     if (updateIdealGoalDto.totalValue !== undefined) {
       if (idealGoalToUpdate.monthlyValue) {
         const { year, month } = this.calculateFutureDate(
@@ -153,7 +152,6 @@ export class IdealGoalService extends BaseService<IdealGoal> {
       }
     }
 
-    // Se o endDate for atualizado, recalcular monthlyValue
     if (
       updateIdealGoalDto.endDate !== undefined &&
       !updateIdealGoalDto.monthlyValue
@@ -164,7 +162,6 @@ export class IdealGoalService extends BaseService<IdealGoal> {
       );
     }
 
-    // Se o monthlyValue for atualizado, recalcular endDate
     if (
       updateIdealGoalDto.monthlyValue !== undefined &&
       !updateIdealGoalDto.endDate
@@ -180,7 +177,6 @@ export class IdealGoalService extends BaseService<IdealGoal> {
       );
     }
 
-    // Validar se a poupança mensal não ultrapassa a renda
     const existingFinancialControll =
       await this.financialControllService._getByParams({
         id: idealGoalToUpdate.financialControllId,
