@@ -1,4 +1,6 @@
+/* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
+import { CreateRealGoalDto } from 'src/app/real-goal/dto/create-real-goal.dto';
 
 export class CreateIdealGoalDto {
   @ApiProperty({
@@ -36,4 +38,6 @@ export class CreateIdealGoalDto {
     description: 'Field containing the forecast for the end date',
   })
   endDate?: Date;
+
+  realGoal: CreateRealGoalDto[];
 }

@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+/* eslint-disable prettier/prettier */
+import { BadRequestException, Inject, Injectable, forwardRef } from '@nestjs/common';
 import { BaseService } from 'src/base/base.service';
 import { IdealGoal } from './entities/ideal-goal.entity';
 import { Repository } from 'typeorm';
@@ -6,6 +7,9 @@ import { CreateIdealGoalDto } from './dto/create-ideal-goal.dto';
 import { FinancialControllService } from '../financial-control/financial-controll.service';
 import { UpdateIdealGoalDto } from './dto/update-ideal-goal.dto';
 import { InjectRepository } from '@nestjs/typeorm';
+//import { CreateRealGoalDto } from '../real-goal/dto/create-real-goal.dto';
+import { RealGoalService } from '../real-goal/real-goal.service';
+import { RealGoal } from '../real-goal/entities/real-goal.entity';
 
 @Injectable()
 export class IdealGoalService extends BaseService<IdealGoal> {
@@ -14,6 +18,8 @@ export class IdealGoalService extends BaseService<IdealGoal> {
     private readonly idealGoalRepository: Repository<IdealGoal>,
 
     private financialControllService: FinancialControllService,
+    @Inject(forwardRef(() => RealGoalService))
+    private realGoalService: RealGoalService,
   ) {
     super(idealGoalRepository);
   }
@@ -70,8 +76,13 @@ export class IdealGoalService extends BaseService<IdealGoal> {
       );
     }
 
-    const idealGoal = this.idealGoalRepository.create(createIdealGoalDto);
-    return this.idealGoalRepository.save(idealGoal);
+    const idealGoalToInsert = {...createIdealGoalDto};
+
+    const idealGoal = this.idealGoalRepository.save(idealGoalToInsert);
+
+    await this.insertRealGoal((await idealGoal).id)
+
+    return idealGoal;
   }
 
   async updateIdealGoalById(
@@ -83,46 +94,71 @@ export class IdealGoalService extends BaseService<IdealGoal> {
       throw new BadRequestException('Meta não encontrada.');
     }
 
-    if (updateIdealGoalDto.monthlyValue) {
-      const newMonthlyValue = updateIdealGoalDto.monthlyValue;
-      existingIdealGoal.monthlyValue = newMonthlyValue;
+      // Converter datas para instâncias de Date se necessário
+  if (updateIdealGoalDto.startDate && !(updateIdealGoalDto.startDate instanceof Date)) {
+    updateIdealGoalDto.startDate = new Date(updateIdealGoalDto.startDate);
+  }
+  if (updateIdealGoalDto.endDate && !(updateIdealGoalDto.endDate instanceof Date)) {
+    updateIdealGoalDto.endDate = new Date(updateIdealGoalDto.endDate);
+  }
+  if (existingIdealGoal.startDate && !(existingIdealGoal.startDate instanceof Date)) {
+    existingIdealGoal.startDate = new Date(existingIdealGoal.startDate);
+  }
+  if (existingIdealGoal.endDate && !(existingIdealGoal.endDate instanceof Date)) {
+    existingIdealGoal.endDate = new Date(existingIdealGoal.endDate);
+  }
+
+    const idealGoalToUpdate = {
+      ...existingIdealGoal,
+      ...updateIdealGoalDto,
+    }
+
+     // Se o totalValue for atualizado, recalcular endDate ou monthlyValue
+  if (updateIdealGoalDto.totalValue !== undefined) {
+    if (idealGoalToUpdate.monthlyValue) {
       const { year, month } = this.calculateFutureDate(
-        newMonthlyValue,
-        existingIdealGoal.totalValue,
+        idealGoalToUpdate.monthlyValue,
+        idealGoalToUpdate.totalValue,
       );
-      existingIdealGoal.endDate = new Date(
-        year,
-        month,
-        existingIdealGoal.startDate.getDate(),
-      );
-    }
-
-    if (updateIdealGoalDto.endDate) {
-      const newEndDate = new Date(updateIdealGoalDto.endDate);
-      existingIdealGoal.endDate = newEndDate;
-      existingIdealGoal.monthlyValue = this.calculateMonthlySavings(
-        existingIdealGoal.totalValue,
-        newEndDate,
+      idealGoalToUpdate.endDate = new Date(year, month, idealGoalToUpdate.startDate.getDate());
+    } else if (idealGoalToUpdate.endDate) {
+      idealGoalToUpdate.monthlyValue = this.calculateMonthlySavings(
+        idealGoalToUpdate.totalValue,
+        idealGoalToUpdate.endDate,
       );
     }
+  }
 
-    if (
-      updateIdealGoalDto.totalValue &&
-      updateIdealGoalDto.totalValue !== existingIdealGoal.totalValue
-    ) {
-      const newTotalValue = updateIdealGoalDto.totalValue;
-      const remainingMonths = this.calculateRemainingMonths(
-        existingIdealGoal.endDate,
-      );
-      const newMonthlyValue = newTotalValue / remainingMonths;
-      existingIdealGoal.totalValue = newTotalValue;
-      existingIdealGoal.monthlyValue = newMonthlyValue;
-    }
+  // Se o endDate for atualizado, recalcular monthlyValue
+  if (updateIdealGoalDto.endDate !== undefined && !updateIdealGoalDto.monthlyValue) {
+    idealGoalToUpdate.monthlyValue = this.calculateMonthlySavings(
+      idealGoalToUpdate.totalValue,
+      idealGoalToUpdate.endDate,
+    );
+  }
 
-    existingIdealGoal.goalName =
-      updateIdealGoalDto.goalName ?? existingIdealGoal.goalName;
+  // Se o monthlyValue for atualizado, recalcular endDate
+  if (updateIdealGoalDto.monthlyValue !== undefined && !updateIdealGoalDto.endDate) {
+    const { year, month } = this.calculateFutureDate(
+      idealGoalToUpdate.monthlyValue,
+      idealGoalToUpdate.totalValue,
+    );
+    idealGoalToUpdate.endDate = new Date(year, month, idealGoalToUpdate.startDate.getDate());
+  }
 
-    return this.idealGoalRepository.save(existingIdealGoal);
+  // Validar se a poupança mensal não ultrapassa a renda
+  const existingFinancialControll =
+    await this.financialControllService._getByParams({
+      id: idealGoalToUpdate.financialControllId,
+    });
+  if (idealGoalToUpdate.monthlyValue > existingFinancialControll.income) {
+    throw new BadRequestException(
+      `Sua poupança mensal não pode ultrapassar o valor de sua renda. 
+      ${idealGoalToUpdate.monthlyValue} é maior que a sua renda de ${existingFinancialControll.income}.`,
+    );
+  }
+
+    return this.idealGoalRepository.save(idealGoalToUpdate);
   }
 
   async deleteIdealGoalById(idealGoalId: number) {
@@ -179,5 +215,15 @@ export class IdealGoalService extends BaseService<IdealGoal> {
       endDate.getMonth() -
       today.getMonth()
     );
+  }
+
+  insertRealGoal(
+    idealGoalId: number,
+    //realGoal: CreateRealGoalDto,
+  ): Promise<RealGoal> {
+    return this.realGoalService.createRealGoal({
+      //...realGoal,
+      idealGoalId: idealGoalId
+    });
   }
 }

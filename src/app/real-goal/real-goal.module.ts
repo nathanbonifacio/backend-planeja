@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { RealGoalController } from './real-goal.controller';
 import { RealGoalService } from './real-goal.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -7,7 +7,10 @@ import { IdealGoalModule } from '../ideal-goal/ideal-goal.module';
 
 @Module({
   controllers: [RealGoalController],
-  imports: [TypeOrmModule.forFeature([RealGoal]), IdealGoalModule],
+  imports: [
+    TypeOrmModule.forFeature([RealGoal]), 
+    forwardRef(() => IdealGoalModule)
+  ],
   exports: [RealGoalService],
   providers: [RealGoalService],
 })
