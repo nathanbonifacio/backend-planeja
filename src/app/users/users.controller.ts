@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common';
 import {
   ApiCreatedResponse,

@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Inputs } from './entities/inputs.entity';
 import { InjectRepository } from '@nestjs/typeorm';

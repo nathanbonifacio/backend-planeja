@@ -1,8 +1,6 @@
 import {
   BadRequestException,
-  Inject,
   Injectable,
-  forwardRef,
 } from '@nestjs/common';
 import { BaseService } from 'src/base/base.service';
 import { IdealGoal } from './entities/ideal-goal.entity';
@@ -11,9 +9,6 @@ import { CreateIdealGoalDto } from './dto/create-ideal-goal.dto';
 import { FinancialControllService } from '../financial-control/financial-controll.service';
 import { UpdateIdealGoalDto } from './dto/update-ideal-goal.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RealGoalService } from '../real-goal/real-goal.service';
-import { RealGoal } from '../real-goal/entities/real-goal.entity';
-import { InputsService } from '../inputs/inputs.service';
 
 @Injectable()
 export class IdealGoalService extends BaseService<IdealGoal> {
@@ -22,12 +17,6 @@ export class IdealGoalService extends BaseService<IdealGoal> {
     private readonly idealGoalRepository: Repository<IdealGoal>,
 
     private financialControllService: FinancialControllService,
-
-    @Inject(forwardRef(() => RealGoalService))
-    private realGoalService: RealGoalService,
-
-    @Inject(forwardRef(() => InputsService))
-    private inputsService: InputsService,
   ) {
     super(idealGoalRepository);
   }
@@ -87,8 +76,6 @@ export class IdealGoalService extends BaseService<IdealGoal> {
     const idealGoalToInsert = { ...createIdealGoalDto };
 
     const idealGoal = this.idealGoalRepository.save(idealGoalToInsert);
-
-    await this.insertRealGoal((await idealGoal).id);
 
     return idealGoal;
   }
@@ -196,16 +183,6 @@ export class IdealGoalService extends BaseService<IdealGoal> {
     if (!existingIdealGoal) {
       throw new BadRequestException('Meta não encontrada.');
     }
-
-    const existingRealGoal = await this.realGoalService._getByParams({
-      id: idealGoalId - 2,
-    });
-    if (!existingRealGoal) {
-      throw new BadRequestException('Meta real não encontrada.');
-    }
-
-    await this.realGoalService.deleteRealGoal(existingRealGoal.id);
-
     return this.idealGoalRepository.delete(idealGoalId);
   }
 
@@ -245,11 +222,5 @@ export class IdealGoalService extends BaseService<IdealGoal> {
     }
 
     return parseFloat((targetAmount / remainingMonths).toFixed(2));
-  }
-
-  insertRealGoal(idealGoalId: number): Promise<RealGoal> {
-    return this.realGoalService.createRealGoal({
-      idealGoalId: idealGoalId,
-    });
   }
 }

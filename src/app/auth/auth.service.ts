@@ -1,7 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../users/users.service';
 import { AuthLoginDto } from './dto/auth-login.dto';
-
 @Injectable()
 export class AuthService {
   constructor(private readonly userService: UserService) {}
@@ -14,7 +13,12 @@ export class AuthService {
     const existingPassword = await this.userService._getByParams({
       password: authLoginDto.password,
     });
-    if (!existingPassword || !existingUser) {
+
+    if (authLoginDto.email !== existingUser.email) {
+      throw new UnauthorizedException('E-mail e/ou senha incorretos.');
+    }
+
+    if (authLoginDto.password !== existingPassword.password) {
       throw new UnauthorizedException('E-mail e/ou senha incorretos.');
     }
 
