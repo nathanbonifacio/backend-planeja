@@ -28,6 +28,13 @@ export class RealGoal {
 
   @ApiProperty({
     nullable: false,
+    description: 'Field containing the real value added by the user.',
+  })
+  @Column({ name: 'added_value', type: 'double', nullable: false })
+  addedValue: number;
+
+  @ApiProperty({
+    nullable: false,
     description: 'Field containg the ideal goal id.',
   })
   @Column({

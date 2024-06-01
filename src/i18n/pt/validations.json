@@ -1,0 +1,23 @@
+{
+  "general": {
+     "invalid": "O campo '{propertyPath}' é inválido.",
+     "required": "O campo '{propertyPath}' é obrigatório.",
+     "item-not-found": "Item não encontrado ({itemReference}).",
+     "item-already-exists": "Item já existe na base de dados ({itemReference})."
+   },
+   "email": {
+    "invalid": "O endereço de e-mail é inválido.",
+    "required": "O endereço de e-mail é obrigatório."
+  },
+  "password": {
+    "invalid": "A senha é inválida.",
+    "required": "A senha é obrigatória.",
+    "dont-match": "As senhas não coincidem.",
+    "dont-iguals": "Nova senha e senha atual não podem ser iguais.",
+    "not-strong-password": "A senha deve conter pelo menos 8 caracteres, uma letra minúscula, uma letra maiúscula, um número e um caractere especial."
+  },
+  "users": {
+    "email-already-registered": "Email já cadastrado.",
+    "user-not-found": "Usuário não encontrado."
+  }
+}

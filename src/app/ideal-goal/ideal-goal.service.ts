@@ -1,7 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { BaseService } from 'src/base/base.service';
 import { IdealGoal } from './entities/ideal-goal.entity';
 import { Repository } from 'typeorm';
@@ -9,6 +6,8 @@ import { CreateIdealGoalDto } from './dto/create-ideal-goal.dto';
 import { FinancialControllService } from '../financial-control/financial-controll.service';
 import { UpdateIdealGoalDto } from './dto/update-ideal-goal.dto';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ItemNotFoundException } from 'src/common/exceptions/item-not-found.exception';
+import { SchemaValidationException } from 'src/common/exceptions/schema-validation.exception';
 
 @Injectable()
 export class IdealGoalService extends BaseService<IdealGoal> {
@@ -27,12 +26,14 @@ export class IdealGoalService extends BaseService<IdealGoal> {
         id: createIdealGoalDto.financialControllId,
       });
     if (!existingFinancialControll) {
-      throw new BadRequestException('Controle financeiro não encontrado');
+      throw new ItemNotFoundException(
+        `Controle financeiro ID: ${existingFinancialControll.id}`,
+      );
     }
 
     if (!createIdealGoalDto.goalName || !createIdealGoalDto.totalValue) {
-      throw new BadRequestException(
-        "Os campos 'Objetivo' e 'Valor Total' são obrigatórios",
+      throw new SchemaValidationException(
+        `Os campos ${createIdealGoalDto.goalName} e ${createIdealGoalDto.totalValue} são obrigatórios.`,
       );
     }
 
@@ -86,7 +87,7 @@ export class IdealGoalService extends BaseService<IdealGoal> {
   ) {
     const existingIdealGoal = await this._getByParams({ id: idealGoalId });
     if (!existingIdealGoal) {
-      throw new BadRequestException('Meta não encontrada.');
+      throw new ItemNotFoundException(`Meta ideal: ${idealGoalId}`);
     }
 
     // Converter datas para instâncias de Date se necessário
@@ -181,7 +182,7 @@ export class IdealGoalService extends BaseService<IdealGoal> {
   async deleteIdealGoalById(idealGoalId: number) {
     const existingIdealGoal = await this._getByParams({ id: idealGoalId });
     if (!existingIdealGoal) {
-      throw new BadRequestException('Meta não encontrada.');
+      throw new ItemNotFoundException(`Meta ideal: ${idealGoalId}`);
     }
     return this.idealGoalRepository.delete(idealGoalId);
   }

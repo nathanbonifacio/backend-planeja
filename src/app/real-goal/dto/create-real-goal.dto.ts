@@ -1,13 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-
 export class CreateRealGoalDto {
   @ApiProperty({
-    description: 'Field containg the data of register',
+    description: 'Field containing the data of register.',
   })
   date?: Date;
 
   @ApiProperty({
-    description: 'Field containg the ideal goal id.',
+    description: 'Field containing the real value added by the user.',
+  })
+  addedValue: number;
+
+  @ApiProperty({
+    description: 'Field containing the ideal goal id.',
   })
   idealGoalId: number;
 }

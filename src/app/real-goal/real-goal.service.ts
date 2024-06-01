@@ -1,8 +1,4 @@
-/* eslint-disable prettier/prettier */
-import {
-  BadRequestException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { BaseService } from 'src/base/base.service';
 import { RealGoal } from './entities/real-goal.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,6 +6,7 @@ import { IdealGoalService } from '../ideal-goal/ideal-goal.service';
 import { CreateRealGoalDto } from './dto/create-real-goal.dto';
 import { Repository } from 'typeorm';
 import { UpdateRealGoalDto } from './dto/update-real-goal.dto';
+import { ItemNotFoundException } from 'src/common/exceptions/item-not-found.exception';
 
 @Injectable()
 export class RealGoalService extends BaseService<RealGoal> {
@@ -27,9 +24,7 @@ export class RealGoalService extends BaseService<RealGoal> {
       id: createRealGoalDto.idealGoalId,
     });
     if (!existingIdealGoal) {
-      throw new BadRequestException(
-        `A meta ideal ${existingIdealGoal.id} não foi encontrada`,
-      );
+      throw new ItemNotFoundException(`${existingIdealGoal.id}`);
     }
 
     if (!createRealGoalDto.date) {

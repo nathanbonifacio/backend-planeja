@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/users.entity';
@@ -6,6 +5,7 @@ import { Not, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { BaseService } from 'src/base/base.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { SchemaValidationException } from 'src/common/exceptions/schema-validation.exception';
 
 @Injectable()
 export class UserService extends BaseService<User> {
@@ -21,8 +21,8 @@ export class UserService extends BaseService<User> {
       email: createUserDto.email,
     });
     if (existingUser) {
-      throw new BadRequestException(
-        `O email ${createUserDto.email} já está cadastrado`,
+      throw new SchemaValidationException(
+        'validations.user.email-already-registered',
       );
     }
 
@@ -30,11 +30,13 @@ export class UserService extends BaseService<User> {
       createUserDto.password,
     );
     if (!isStrongPassword) {
-      throw new BadRequestException('A senha não é forte o suficiente');
+      throw new SchemaValidationException(
+        'validations.password.not-strong-password',
+      );
     }
 
     if (createUserDto.confirmPassword != createUserDto.password) {
-      throw new BadRequestException('As senhas devem ser iguais');
+      throw new SchemaValidationException('validations.password.dont-match');
     }
 
     const userToCreate = {
@@ -51,7 +53,7 @@ export class UserService extends BaseService<User> {
       id: userId,
     });
     if (!existingUser) {
-      throw new BadRequestException(`O usuário ${userId} não está cadastrado.`);
+      throw new SchemaValidationException('validations.user.user-not-found');
     }
 
     if (updateUserDto.email) {
@@ -80,7 +82,7 @@ export class UserService extends BaseService<User> {
       id: userId,
     });
     if (!existingUser) {
-      throw new BadRequestException(`O client ${userId} não foi encontrado.`);
+      throw new SchemaValidationException('validations.user.user-not-found');
     }
 
     return this.usersRepository.delete(userId);

@@ -11,6 +11,8 @@ import { Repository } from 'typeorm';
 import { CreateFinancialControllDto } from './dto/create-financial-controll.dto';
 import { UserService } from '../users/users.service';
 import { UpdateFinancialControllDto } from './dto/update-financial-controll.dto';
+import { SchemaValidationException } from 'src/common/exceptions/schema-validation.exception';
+import { ItemNotFoundException } from 'src/common/exceptions/item-not-found.exception';
 
 @Injectable()
 export class FinancialControllService extends BaseService<FinancialControll> {
@@ -31,7 +33,7 @@ export class FinancialControllService extends BaseService<FinancialControll> {
       id: createFinancialControlDto.userId,
     });
     if (!existingUser) {
-      throw new BadRequestException('Usuário não encontrado');
+      throw new SchemaValidationException('validations.user.user-not-found');
     }
 
     return this.financialControllRepository.save(createFinancialControlDto);
@@ -45,7 +47,7 @@ export class FinancialControllService extends BaseService<FinancialControll> {
       id: financialId,
     });
     if (!existingUser) {
-      throw new BadRequestException('Usuário não encontrado');
+      throw new SchemaValidationException('validations.user.user-not-found');
     }
 
     const financialUpdated = await this.financialControllRepository.update(
@@ -61,7 +63,7 @@ export class FinancialControllService extends BaseService<FinancialControll> {
       id: financialId,
     });
     if (!existingFinancialId) {
-      throw new BadRequestException('Usuário não encontrado');
+      throw new ItemNotFoundException(financialId);
     }
 
     return this.financialControllRepository.delete(financialId);
