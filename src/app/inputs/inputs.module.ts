@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { InputsController } from './inputs.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Inputs } from './entities/inputs.entity';
@@ -10,7 +10,7 @@ import { InputsService } from './inputs.service';
   controllers: [InputsController],
   imports: [
     TypeOrmModule.forFeature([Inputs]),
-    RealGoalModule,
+    forwardRef(() => RealGoalModule),
     FinancialControllModule,
   ],
   providers: [InputsService],

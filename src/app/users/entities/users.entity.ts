@@ -42,18 +42,4 @@ export class User {
   })
   @Column({ name: 'password', type: 'text', nullable: false })
   password: string;
-
-  @ApiProperty({
-    nullable: false,
-    description: 'Field containing the birthdate of the user.',
-  })
-  @Column({ name: 'birthdate', type: 'date', nullable: false })
-  birthdate: Date;
-
-  @ApiProperty({
-    nullable: false,
-    description: 'Field containing the Whatsapp number of the user.',
-  })
-  @Column({ name: 'whatsapp', type: 'varchar', unique: true, nullable: false })
-  whatsapp: string;
 }

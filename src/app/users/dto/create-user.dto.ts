@@ -17,18 +17,6 @@ export class CreateUserDto {
 
   @ApiProperty({
     required: true,
-    description: 'Field containing the birthdate of the user.',
-  })
-  birthdate: Date;
-
-  @ApiProperty({
-    required: true,
-    description: 'Field containing the Whatsapp number of the user.',
-  })
-  whatsapp: string;
-
-  @ApiProperty({
-    required: true,
     description: 'Field containing the password of the user.',
   })
   @IsStrongPassword({

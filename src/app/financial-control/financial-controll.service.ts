@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  forwardRef,
-} from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { BaseService } from 'src/base/base.service';
 import { FinancialControll } from './entities/financial-controll.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -33,7 +28,7 @@ export class FinancialControllService extends BaseService<FinancialControll> {
       id: createFinancialControlDto.userId,
     });
     if (!existingUser) {
-      throw new SchemaValidationException('validations.user.user-not-found');
+      throw new SchemaValidationException('Usuário não encontrado.');
     }
 
     return this.financialControllRepository.save(createFinancialControlDto);
@@ -47,7 +42,7 @@ export class FinancialControllService extends BaseService<FinancialControll> {
       id: financialId,
     });
     if (!existingUser) {
-      throw new SchemaValidationException('validations.user.user-not-found');
+      throw new SchemaValidationException('Usuário não encontrado.');
     }
 
     const financialUpdated = await this.financialControllRepository.update(

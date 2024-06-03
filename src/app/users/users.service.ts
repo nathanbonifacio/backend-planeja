@@ -21,9 +21,7 @@ export class UserService extends BaseService<User> {
       email: createUserDto.email,
     });
     if (existingUser) {
-      throw new SchemaValidationException(
-        'validations.user.email-already-registered',
-      );
+      throw new SchemaValidationException('Email já cadastrado.');
     }
 
     const isStrongPassword = this.validatePasswordStrength(
@@ -31,12 +29,12 @@ export class UserService extends BaseService<User> {
     );
     if (!isStrongPassword) {
       throw new SchemaValidationException(
-        'validations.password.not-strong-password',
+        'A senha deve conter pelo menos 8 caracteres, uma letra minúscula, uma letra maiúscula, um número e um caractere especial.',
       );
     }
 
     if (createUserDto.confirmPassword != createUserDto.password) {
-      throw new SchemaValidationException('validations.password.dont-match');
+      throw new SchemaValidationException('As senhas não coincidem.');
     }
 
     const userToCreate = {
@@ -53,7 +51,7 @@ export class UserService extends BaseService<User> {
       id: userId,
     });
     if (!existingUser) {
-      throw new SchemaValidationException('validations.user.user-not-found');
+      throw new SchemaValidationException('Usuário não encontrado.');
     }
 
     if (updateUserDto.email) {
@@ -82,7 +80,7 @@ export class UserService extends BaseService<User> {
       id: userId,
     });
     if (!existingUser) {
-      throw new SchemaValidationException('validations.user.user-not-found');
+      throw new SchemaValidationException('Usuário não encontrado.');
     }
 
     return this.usersRepository.delete(userId);

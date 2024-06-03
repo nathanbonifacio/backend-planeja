@@ -1,5 +1,9 @@
-/* eslint-disable prettier/prettier */
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { Inputs } from './entities/inputs.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -15,6 +19,7 @@ export class InputsService extends BaseService<Inputs> {
     @InjectRepository(Inputs)
     private readonly inputsRepository: Repository<Inputs>,
 
+    @Inject(forwardRef(() => RealGoalService))
     private realGoalService: RealGoalService,
     private financialControllService: FinancialControllService,
   ) {

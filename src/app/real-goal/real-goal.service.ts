@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { BaseService } from 'src/base/base.service';
 import { RealGoal } from './entities/real-goal.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +12,7 @@ import { CreateRealGoalDto } from './dto/create-real-goal.dto';
 import { Repository } from 'typeorm';
 import { UpdateRealGoalDto } from './dto/update-real-goal.dto';
 import { ItemNotFoundException } from 'src/common/exceptions/item-not-found.exception';
+import { InputsService } from '../inputs/inputs.service';
 
 @Injectable()
 export class RealGoalService extends BaseService<RealGoal> {
@@ -15,6 +21,9 @@ export class RealGoalService extends BaseService<RealGoal> {
     private readonly realGoalRepository: Repository<RealGoal>,
 
     private idealGoalService: IdealGoalService,
+
+    @Inject(forwardRef(() => InputsService))
+    private inputsService: InputsService,
   ) {
     super(realGoalRepository);
   }
@@ -31,7 +40,9 @@ export class RealGoalService extends BaseService<RealGoal> {
       createRealGoalDto.date = new Date();
     }
 
-    return this.realGoalRepository.save(createRealGoalDto);
+    const realGoal = this.realGoalRepository.save(createRealGoalDto);
+
+    return realGoal;
   }
 
   async updateRealGoal(

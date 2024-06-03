@@ -9,11 +9,11 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
-  .setTitle('Planejá')
-  .setDescription('The Planejá API description')
-  .setVersion('7.3.1')
-  .addTag('planejá')
-  .build();
+    .setTitle('Planejá')
+    .setDescription('The Planejá API description')
+    .setVersion('7.3.1')
+    .addTag('planejá')
+    .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   app.enableCors({
