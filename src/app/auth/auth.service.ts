@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../users/users.service';
 import { AuthLoginDto } from './dto/auth-login.dto';
@@ -14,6 +15,9 @@ export class AuthService {
       password: authLoginDto.password,
     });
 
+    authLoginDto.email === existingUser.email;
+    authLoginDto.password === existingPassword.password;
+
     if (authLoginDto.email !== existingUser.email) {
       throw new UnauthorizedException('E-mail e/ou senha incorretos.');
     }
@@ -22,8 +26,8 @@ export class AuthService {
       throw new UnauthorizedException('E-mail e/ou senha incorretos.');
     }
 
-    const email = existingUser.email;
-    const password = existingPassword.password;
+    const email = authLoginDto.email;
+    const password = authLoginDto.password;
 
     return { email, password };
   }
