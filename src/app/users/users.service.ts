@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/users.entity';
@@ -69,6 +70,13 @@ export class UserService extends BaseService<User> {
       }
     }
 
+    if (updateUserDto.password) {
+      updateUserDto.password = await bcrypt.hash(
+        updateUserDto.password,
+        await bcrypt.genSalt(),
+      );
+    }
+
     const userToUpdate = {
       ...existingUser,
       ...updateUserDto,
@@ -89,12 +97,4 @@ export class UserService extends BaseService<User> {
 
     return this.usersRepository.delete(userId);
   }
-
-  // private validatePasswordStrength(password: string): boolean {
-  //   const passwordValidationRegex = new RegExp(
-  //     '^(?=(.*[aA-zZ]))(?=(.*[0-9]))(?=(.*[!@#$%^&*()\\-_+.])).{8,}$',
-  //   );
-
-  //   return passwordValidationRegex.test(password);
-  // }
 }
