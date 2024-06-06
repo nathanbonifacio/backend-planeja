@@ -6,6 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { BaseService } from 'src/base/base.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { SchemaValidationException } from 'src/common/exceptions/schema-validation.exception';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService extends BaseService<User> {
@@ -24,16 +25,19 @@ export class UserService extends BaseService<User> {
       throw new SchemaValidationException('Email já cadastrado.');
     }
 
-    const isStrongPassword = this.validatePasswordStrength(
+    const isStrongPassword = (createUserDto.password = await bcrypt.hash(
       createUserDto.password,
-    );
+      await bcrypt.genSalt(),
+    ));
     if (!isStrongPassword) {
       throw new SchemaValidationException(
         'A senha deve conter pelo menos 8 caracteres, uma letra minúscula, uma letra maiúscula, um número e um caractere especial.',
       );
     }
 
-    if (createUserDto.confirmPassword != createUserDto.password) {
+    if (
+      !(await bcrypt.compare(createUserDto.confirmPassword, isStrongPassword))
+    ) {
       throw new SchemaValidationException('As senhas não coincidem.');
     }
 
@@ -86,11 +90,11 @@ export class UserService extends BaseService<User> {
     return this.usersRepository.delete(userId);
   }
 
-  private validatePasswordStrength(password: string): boolean {
-    const passwordValidationRegex = new RegExp(
-      '^(?=(.*[aA-zZ]))(?=(.*[0-9]))(?=(.*[!@#$%^&*()\\-_+.])).{8,}$',
-    );
+  // private validatePasswordStrength(password: string): boolean {
+  //   const passwordValidationRegex = new RegExp(
+  //     '^(?=(.*[aA-zZ]))(?=(.*[0-9]))(?=(.*[!@#$%^&*()\\-_+.])).{8,}$',
+  //   );
 
-    return passwordValidationRegex.test(password);
-  }
+  //   return passwordValidationRegex.test(password);
+  // }
 }
