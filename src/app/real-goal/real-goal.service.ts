@@ -13,6 +13,7 @@ import { Repository } from 'typeorm';
 import { UpdateRealGoalDto } from './dto/update-real-goal.dto';
 import { ItemNotFoundException } from 'src/common/exceptions/item-not-found.exception';
 import { InputsService } from '../inputs/inputs.service';
+import { CreateInputsDto } from '../inputs/dto/create-inputs.dto';
 
 @Injectable()
 export class RealGoalService extends BaseService<RealGoal> {
@@ -41,6 +42,15 @@ export class RealGoalService extends BaseService<RealGoal> {
     }
 
     const realGoal = this.realGoalRepository.save(createRealGoalDto);
+
+    const createInputsDto: CreateInputsDto = {
+      realGoalId: (await realGoal).id,
+      date: createRealGoalDto.date,
+      balance: createRealGoalDto.addedValue,
+      financialControllId: existingIdealGoal.financialControllId
+    };
+
+    await this.inputsService.createInputs(createInputsDto);
 
     return realGoal;
   }

@@ -14,7 +14,7 @@ export class CreateInputsDto {
   @ApiProperty({
     description: 'Field containg the observations of the user.',
   })
-  observations: string;
+  observations?: string;
 
   @ApiProperty({
     required: true,
