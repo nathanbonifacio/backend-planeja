@@ -47,7 +47,7 @@ export class RealGoalService extends BaseService<RealGoal> {
       realGoalId: (await realGoal).id,
       date: createRealGoalDto.date,
       balance: createRealGoalDto.addedValue,
-      financialControllId: existingIdealGoal.financialControllId
+      financialControllId: existingIdealGoal.financialControllId,
     };
 
     await this.inputsService.createInputs(createInputsDto);

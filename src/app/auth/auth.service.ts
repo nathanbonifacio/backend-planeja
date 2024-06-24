@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../users/users.service';
 import { AuthLoginDto } from './dto/auth-login.dto';
@@ -10,10 +11,6 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
-
-  async createToken() {}
-
-  async checkToken() {}
 
   async login(authLoginDto: AuthLoginDto) {
     const existingUser = await this.userService._getByParams({
@@ -30,9 +27,14 @@ export class AuthService {
       throw new UnauthorizedException('E-mail e/ou senha incorretos.');
     }
 
-    const email = authLoginDto.email;
+    //const email = authLoginDto.email;
 
-    return { email };
+    // return { email };
+
+    const payload = { sub: existingUser.id, email: existingUser.email };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 
   async forget(forget: AuthForgetDto) {
@@ -46,7 +48,18 @@ export class AuthService {
     return true;
   }
 
-  // async reset(reset: AuthResetDto, token: string) {
-  //   await this.userService.update(reset,token);
-  // }
+  async signIn(
+    email: string,
+    pass: string,
+  ): Promise<{ access_token: string }> {
+    const user = await this.userService._getByParams({email: email});
+    if (user?.password !== pass) {
+      throw new UnauthorizedException();
+    }
+    const payload = { sub: user.id, email: user.email };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
+  }
+
 }
