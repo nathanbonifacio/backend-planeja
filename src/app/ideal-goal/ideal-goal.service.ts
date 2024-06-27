@@ -22,15 +22,6 @@ export class IdealGoalService extends BaseService<IdealGoal> {
   }
 
   async createIdealGoal(createIdealGoalDto: CreateIdealGoalDto) {
-    // const existingFinancialControll =
-    //   await this.financialControllService._getByParams({
-    //     id: createIdealGoalDto.financialControllId,
-    //   });
-    // if (!existingFinancialControll) {
-    //   throw new ItemNotFoundException(
-    //     `Controle financeiro ID: ${existingFinancialControll.id}`,
-    //   );
-    // }
 
     if (!createIdealGoalDto.goalName || !createIdealGoalDto.totalValue) {
       throw new SchemaValidationException(
@@ -38,15 +29,13 @@ export class IdealGoalService extends BaseService<IdealGoal> {
       );
     }
 
-    // if (
-    //   createIdealGoalDto.monthlyValue &&
-    //   createIdealGoalDto.monthlyValue > existingFinancialControll.income
-    // ) {
-    //   throw new BadRequestException(
-    //     `Sua poupança mensal não pode ultrapassar o valor de sua renda. 
-    //     ${createIdealGoalDto.monthlyValue} é maior que a sua renda de ${existingFinancialControll.income}.`,
-    //   );
-    // }
+    if (createIdealGoalDto.totalValue < 0 || createIdealGoalDto.monthlyValue < 0) {
+      throw new BadRequestException('Não pode ser um valor negativo');
+    }
+
+    if (createIdealGoalDto.endDate < createIdealGoalDto.startDate) {
+      throw new BadRequestException('Não pode ser uma data inferior que a inicial');
+    }
 
     if (!createIdealGoalDto.startDate) {
       createIdealGoalDto.startDate = new Date();
