@@ -39,17 +39,24 @@ export class FinancialControll {
 
   @ApiProperty({
     nullable: true,
-    description: 'Field containing the fixed expenses of the user.',
+    description: 'Field containing the variable expenses of the user.',
   })
-  @Column({ name: 'fixed_expenses', type: 'double', nullable: true })
-  fixedExpenses: number;
+  @Column({ name: 'expenses', type: 'double', nullable: false })
+  expenses: number;
 
   @ApiProperty({
     nullable: true,
     description: 'Field containing the variable expenses of the user.',
   })
-  @Column({ name: 'variable_expenses', type: 'double', nullable: true })
-  variableExpenses: number;
+  @Column({ name: 'description', type: 'varchar', nullable: false })
+  description: string;
+
+  @ApiProperty({
+    nullable: true,
+    description: 'Field containing the variable expenses of the user.',
+  })
+  @Column({ name: 'total', type: 'double', nullable: false })
+  total: number;
 
   @OneToMany(() => IdealGoal, (idealGoal) => idealGoal.financialControll)
   idealGoals: IdealGoal[];

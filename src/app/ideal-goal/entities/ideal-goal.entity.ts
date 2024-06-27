@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
 import { FinancialControll } from 'src/app/financial-control/entities/financial-controll.entity';
 import { RealGoal } from 'src/app/real-goal/entities/real-goal.entity';
@@ -27,9 +28,9 @@ export class IdealGoal {
     name: 'financial_controll_id',
     type: 'int',
     unsigned: true,
-    nullable: false,
+    nullable: true,
   })
-  financialControllId: number;
+  financialControllId?: number;
 
   @ManyToOne(
     () => FinancialControll,

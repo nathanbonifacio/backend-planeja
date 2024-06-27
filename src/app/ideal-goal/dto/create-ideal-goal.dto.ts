@@ -7,7 +7,7 @@ export class CreateIdealGoalDto {
     required: true,
     description: 'Field containing the user real value',
   })
-  financialControllId: number;
+  financialControllId?: number;
 
   @ApiProperty({
     required: true,

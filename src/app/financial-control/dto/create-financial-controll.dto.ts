@@ -1,12 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateFinancialControllDto {
-  // @ApiProperty({
-  //   required: true,
-  //   description: 'Field containing the user email.',
-  // })
-  // email: string;
-
   @ApiProperty({
     required: true,
     description: 'Field containing the id of the user.',
@@ -21,13 +15,19 @@ export class CreateFinancialControllDto {
 
   @ApiProperty({
     required: false,
-    description: 'Field containing the fixed expenses of the user.',
+    description: 'Field containing the expenses of the user.',
   })
-  fixedExpenses?: number;
+  expenses?: number;
 
   @ApiProperty({
     required: false,
-    description: 'Field containing the variable expenses of the user.',
+    description: 'Field containing the description of the user.',
   })
-  variableExpenses?: number;
+  description: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Field containing the total of the user.',
+  })
+  total: number;
 }

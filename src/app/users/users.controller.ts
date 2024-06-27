@@ -1,5 +1,12 @@
-/* eslint-disable prettier/prettier */
-import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import {
   ApiCreatedResponse,
   ApiNoContentResponse,
@@ -12,6 +19,7 @@ import {
 import { UserService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/users.entity';
 
 @ApiTags('Users')
 @Controller('users')
@@ -66,5 +74,18 @@ export class UserController {
   })
   deleteUserById(@Param('id') userId: number) {
     return this.userService.deleteUserById(userId);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Finds an user by its ID.' })
+  @ApiOkResponse({
+    type: User,
+    description: 'Value returned whenever a user with a given ID is found.',
+  })
+  @ApiNotFoundResponse({
+    description: 'Error thrown whenever the user is not found.',
+  })
+  findOne(@Param('id') id: number) {
+    return this.userService.find(id);
   }
 }

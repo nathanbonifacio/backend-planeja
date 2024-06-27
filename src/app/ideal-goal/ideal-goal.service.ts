@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { BaseService } from 'src/base/base.service';
 import { IdealGoal } from './entities/ideal-goal.entity';
@@ -21,15 +22,15 @@ export class IdealGoalService extends BaseService<IdealGoal> {
   }
 
   async createIdealGoal(createIdealGoalDto: CreateIdealGoalDto) {
-    const existingFinancialControll =
-      await this.financialControllService._getByParams({
-        id: createIdealGoalDto.financialControllId,
-      });
-    if (!existingFinancialControll) {
-      throw new ItemNotFoundException(
-        `Controle financeiro ID: ${existingFinancialControll.id}`,
-      );
-    }
+    // const existingFinancialControll =
+    //   await this.financialControllService._getByParams({
+    //     id: createIdealGoalDto.financialControllId,
+    //   });
+    // if (!existingFinancialControll) {
+    //   throw new ItemNotFoundException(
+    //     `Controle financeiro ID: ${existingFinancialControll.id}`,
+    //   );
+    // }
 
     if (!createIdealGoalDto.goalName || !createIdealGoalDto.totalValue) {
       throw new SchemaValidationException(
@@ -37,15 +38,15 @@ export class IdealGoalService extends BaseService<IdealGoal> {
       );
     }
 
-    if (
-      createIdealGoalDto.monthlyValue &&
-      createIdealGoalDto.monthlyValue > existingFinancialControll.income
-    ) {
-      throw new BadRequestException(
-        `Sua poupança mensal não pode ultrapassar o valor de sua renda. 
-        ${createIdealGoalDto.monthlyValue} é maior que a sua renda de ${existingFinancialControll.income}.`,
-      );
-    }
+    // if (
+    //   createIdealGoalDto.monthlyValue &&
+    //   createIdealGoalDto.monthlyValue > existingFinancialControll.income
+    // ) {
+    //   throw new BadRequestException(
+    //     `Sua poupança mensal não pode ultrapassar o valor de sua renda. 
+    //     ${createIdealGoalDto.monthlyValue} é maior que a sua renda de ${existingFinancialControll.income}.`,
+    //   );
+    // }
 
     if (!createIdealGoalDto.startDate) {
       createIdealGoalDto.startDate = new Date();
